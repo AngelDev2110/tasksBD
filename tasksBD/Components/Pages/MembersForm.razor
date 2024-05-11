@@ -1,0 +1,65 @@
+﻿@page "/members/new"
+@page "/members/edit/{Id:int}"
+
+@rendermode InteractiveServer
+@inject NavigationManager _navigator;
+@inject IRepositoryMembers _repository;
+<h2>@_message Miembro</h2>
+<EditForm Model="_member" FormName="frmMember" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+        <div class="col-10">
+            <InputText id="txtNombre" class="form-control" @bind-Value="_member.Name" />
+            <ValidationMessage For="()=>_member.Name" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtCorreo" class="col-2 col-form-label">Correo</label>
+        <div class="col-10">
+            <InputText id="txtCorreo" class="form-control" @bind-Value="_member.Email" />
+            <ValidationMessage For="()=>_member.Email" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-danger ms-3" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private string _message = "";
+    private Member? _member = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            _member = await _repository.Get(Id);
+            _message = "Modificar";
+        }
+        else
+        {
+            _message = "Nuevo";
+        }
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repository.Update(Id, _member!);
+        }
+        else
+        {
+            await _repository.Add(_member!);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/members", forceLoad: true);
+    }
+}

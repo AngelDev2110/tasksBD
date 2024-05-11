@@ -1,0 +1,89 @@
+﻿@page "/tasks/new"
+@page "/tasks/edit/{Id:int}"
+
+@rendermode InteractiveServer
+@inject NavigationManager _navigator;
+@inject IRepositoryTasks _repository;
+@inject IRepositoryMembers _repositoryMembers;
+
+<h2>@_message Tarea</h2>
+<EditForm Model="_task" FormName="frmTask" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="row mb-3">
+        <label for="txtTitle" class="col-2 col-form-label">Título</label>
+        <div class="col-10">
+            <InputText id="txtTitle" class="form-control" @bind-Value="_task.Title" />
+            <ValidationMessage For="()=>_task.Title" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtCorreo" class="col-2 col-form-label">Descripción</label>
+        <div class="col-10">
+            <InputText id="txtCorreo" class="form-control" @bind-Value="_task.Description" />
+            <ValidationMessage For="()=>_task.Description" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtState" class="col-2 col-form-label">Estado</label>
+        <div class="col-10">
+            <InputText id="txtState" class="form-control" @bind-Value="_task.TaskState" />
+            <ValidationMessage For="()=>_task.TaskState" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtResponsible" class="col-2 col-form-label">Responsable</label>
+        <div class="col-10">
+            <InputSelect id="txtResponsible" class="form-control" @bind-Value="_task.MemberId" >
+                @foreach (var member in _Members ?? [])
+                {
+                    <option value="@member?.Id">@member?.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="()=>_task.MemberId" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-danger ms-3" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private string _message = "";
+    private MemberTask? _task = new();
+    private List<Member>? _Members;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            _task = await _repository.Get(Id);
+            _message = "Modificar";
+        }
+        else
+        {
+            _message = "Nuevo";
+        }
+        _Members = await _repositoryMembers.GetAll();
+        _task.MemberId = _Members[0].Id;
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repository.Update(Id, _task!);
+        }
+        else
+        {
+            await _repository.Add(_task!);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/tasks", forceLoad: true);
+    }
+}
