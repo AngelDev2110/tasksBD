@@ -56,6 +56,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _Members = await _repositoryMembers.GetAll();
         if (Id > 0)
         {
             _task = await _repository.Get(Id);
@@ -64,9 +65,10 @@
         else
         {
             _message = "Nuevo";
+            _task.MemberId = _Members[0].Id;
         }
-        _Members = await _repositoryMembers.GetAll();
-        _task.MemberId = _Members[0].Id;
+        
+        
     }
 
     private async void Guardar()

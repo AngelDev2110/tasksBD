@@ -1,7 +1,24 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager _navigator;
+
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Bienvenido al administrador de tareas</h1>
 
-Welcome to your new app.
+<h3 class="mb-5 mt-3">Administra los usuarios y tareas que necesites sin tener perdida de datos:</h3>
+
+<button class="btn btn-primary" @onclick="goToMembers" @onclick:preventDefault>Ir a ver los miembros</button>
+<button class="btn btn-success ms-3" @onclick="goToTasks" @onclick:preventDefault>Ir a ver las tareas</button>
+
+@code{
+    private void goToMembers()
+    {
+        _navigator.NavigateTo("/members", forceLoad: true);
+    }
+    private void goToTasks()
+    {
+        _navigator.NavigateTo("/tasks", forceLoad: true);
+    }
+}
