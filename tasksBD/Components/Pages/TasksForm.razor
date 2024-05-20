@@ -26,8 +26,16 @@
     <div class="row mb-3">
         <label for="txtState" class="col-2 col-form-label">Estado</label>
         <div class="col-10">
-            <InputText id="txtState" class="form-control" @bind-Value="_task.TaskState" />
-            <ValidationMessage For="()=>_task.TaskState" />
+            <InputRadioGroup id="txtStateGroup" class="form-control" @bind-Value="_task.TaskState">
+                <div class="form-check">
+                    <InputRadio id="txtStatePendiente" class="form-check-input" Value="@pendiente" />
+                    <label class="form-check-label" for="txtStatePendiente">Pendiente</label>
+                </div>
+                <div class="form-check">
+                    <InputRadio id="txtStateTerminada" class="form-check-input" Value="@terminada" />
+                    <label class="form-check-label" for="txtStateTerminada">Terminada</label>
+                </div>
+            </InputRadioGroup>
         </div>
     </div>
     <div class="row mb-3">
@@ -52,7 +60,11 @@
     public int Id { get; set; }
     private string _message = "";
     private MemberTask? _task = new();
+    private bool taskEnded = false;
     private List<Member>? _Members;
+    const string pendiente = "Pendiente";
+    const string terminada = "Terminada";
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,8 +79,8 @@
             _message = "Nuevo";
             _task.MemberId = _Members[0].Id;
         }
-        
-        
+
+
     }
 
     private async void Guardar()
